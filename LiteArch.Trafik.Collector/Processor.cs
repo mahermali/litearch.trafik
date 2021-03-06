@@ -8,7 +8,7 @@ using LiteArch.Trafik.Domain;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace LiteArch.Trafic.Collector
+namespace LiteArch.Trafik.Collector
 {
     public class Processor
     {

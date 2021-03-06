@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Microsoft.Extensions.Configuration;
 
-namespace LiteArch.Trafic.Collector
+namespace LiteArch.Trafik.Collector
 {
     class Program
     {

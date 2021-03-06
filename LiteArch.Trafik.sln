@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafic.Collector", "LiteArch.Trafic.Collector\LiteArch.Trafic.Collector.csproj", "{2C70969D-1364-4404-9942-A97B05FF7F27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafik.Collector", "LiteArch.Trafik.Collector\LiteArch.Trafik.Collector.csproj", "{2C70969D-1364-4404-9942-A97B05FF7F27}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafik.Domain", "LiteArch.Trafik.Domain\LiteArch.Trafik.Domain.csproj", "{26564E6B-CBB1-4044-BD39-37F2D0804540}"
 EndProject
