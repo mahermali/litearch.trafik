@@ -18,6 +18,7 @@ namespace LiteArch.Trafik.Collector
             Console.WriteLine("Starting ...");
             while (true)
             {
+                Console.WriteLine("Waiting for client ...");
                 new Processor(server.AcceptTcpClient(),configuration).Process().ConfigureAwait(false);
             }
         }
