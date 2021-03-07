@@ -26,8 +26,8 @@ jobs:
           push: true
           file: ./Dockerfile.Collector
           tags: |
-            maherali/litearch-collector:latest 
-            maherali/litearch-collector:${{ github.run_number }}
+            maherali/litearch-trafik-collector:latest 
+            maherali/litearch-trafik-collector:${{ github.run_number }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   consolidator:
@@ -50,8 +50,8 @@ jobs:
           push: true
           file: ./Dockerfile.Consolidator
           tags: |
-            maherali/litearch-consolidator:latest 
-            maherali/litearch-consolidator:${{ github.run_number }}
+            maherali/litearch-trafik-consolidator:latest 
+            maherali/litearch-trafik-consolidator:${{ github.run_number }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   
