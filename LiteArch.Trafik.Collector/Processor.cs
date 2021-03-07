@@ -33,11 +33,9 @@ namespace LiteArch.Trafik.Collector
         {
             var sr = new StreamReader(_stream);
             string data;
-            var sw = new Stopwatch();
-            sw.Start();
             try
             {
-                while ((data = sr.ReadLine()) != null)
+                while ((data = await sr.ReadLineAsync()) != null)
                 {
                     Console.WriteLine(data);
                     if (string.IsNullOrEmpty(data)) continue;
@@ -53,6 +51,7 @@ namespace LiteArch.Trafik.Collector
             }
             catch (Exception e)
             {
+                Console.WriteLine("Error: "+e.Message);
                 _stream.Close();
             }
         }
