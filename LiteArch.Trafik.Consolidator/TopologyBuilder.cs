@@ -12,7 +12,7 @@ using StackExchange.Redis;
 
 namespace LiteArch.Trafik.Consolidator
 {
-    public class TopologyBuilder
+    public class TopologyBuilder:IDisposable
     {
         private readonly IConfiguration _configuration;
         private readonly HttpClient _consulClient;
@@ -132,6 +132,12 @@ namespace LiteArch.Trafik.Consolidator
             }
 
             return addressAndPort;
+        }
+
+        public void Dispose()
+        {
+            _consulClient?.Dispose();
+            _redisConnection?.Dispose();
         }
     }
 }
