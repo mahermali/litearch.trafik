@@ -18,7 +18,8 @@ app.get('/', (req, res) => {
 
 app.get('/env', (req,res)=>{
     res.send({
-        baseUrl: process.env.TRAFIK_API_URL
+        baseUrl: process.env.TRAFIK_API_URL,
+        portalPrefix: process.env.TRAFIK_PORTAL_PREFIX
     })
 })
 
