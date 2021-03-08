@@ -1,0 +1,210 @@
+<html>
+<head>
+    <script src="js/d3.v6.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="wrapper">
+    <div id="layers">
+        <div class="img-container">
+            <img src="img/logo.png"/>
+        </div>
+        <div class="counter-container">
+            <span>Nodes:</span> <label class="counter" id="nodes-count"></label>
+        </div>
+        <div class="counter-container">
+            <span>Links:</span> <label class="counter" id="links-count"></label>
+        </div>
+    </div>
+    <div id="container"></div>
+</div>
+</body>
+
+<script lang="javascript">
+    const radius = 20
+    const body = d3.select('body')
+    const container = d3.select('#container')
+    const width = container.node().getBoundingClientRect().width
+    const height = body.node().getBoundingClientRect().height
+    const color = d3.scaleOrdinal(d3.schemeAccent);
+
+    const svg = container.append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .style('background-color', 'black')
+    let nodes = [],
+        links = [],
+        simulation = d3.forceSimulation(nodes)
+            .force('collide', d3.forceCollide())
+            .force("charge", d3.forceManyBody().strength(-1000))
+            .force("link", d3.forceLink(links).distance(200))
+            .force("forceX", d3.forceX())
+            .force("forceY", d3.forceY())
+            .on("tick", ticked);
+
+    const dragstarted = function (event, d) {
+        if (!event.active) simulation.alphaTarget(1).restart();
+        d3.select(this).attr("transform", (d) => "translate(" + (d.x = event.x) + "," + (d.y = event.y) + ")");
+    }
+
+    const dragged = function (event, d) {
+        d3.select(this).attr("transform", (d) => "translate(" + (d.x = event.x) + "," + (d.y = event.y) + ")");
+    }
+
+    const dragended = function (event, d) {
+        if (!event.active) simulation.alphaTarget(0);
+    }
+
+
+    let g = svg.append("g"),
+        link = g.append("g").selectAll(".link"),
+        node = g.append("g").selectAll(".node");
+
+    var zoom=d3.zoom()
+        .on("zoom", function (event) {
+            g.attr("transform",event.transform)
+            node.attr("transform",event.transform)
+            simulation.alphaTarget(1).restart()
+        })
+
+    svg.call(zoom)
+    refresh()
+    start()
+
+    function ticked() {
+        node.attr("transform", function(d) {
+            return "translate(" + d.x + "," + d.y + ")"
+        });
+
+        link.attr("x1", function (d) {
+            return d.source.x;
+        })
+            .attr("y1", function (d) {
+                return d.source.y;
+            })
+            .attr("x2", function (d) {
+                return d.target.x;
+            })
+            .attr("y2", function (d) {
+                return d.target.y;
+            });
+    }
+
+    function start() {
+        d3.interval(function () {
+            refresh()
+        }, 30000)
+    }
+
+    function merge(json) {
+
+        nodes.forEach(function (node, index) {
+            if (json.nodes.every(n => n.id != node.id))
+                nodes.splice(index, 1)
+        })
+
+        json.nodes.forEach(function (node, index) {
+            if (nodes.every(n => n.id != node.id))
+                nodes.push(node)
+        })
+
+        links = json.links
+
+        d3.select('#nodes-count').text(json.nodes?.length)
+        d3.select('#links-count').text(json.links?.length)
+    }
+
+    function refresh() {
+        let env=d3.json('/env').then(r=>{
+            let baseUrl=r.baseUrl
+            d3.json(`${baseUrl}/topology`).then(json => {
+
+                merge(json)
+
+                node = node.data(nodes, function (d) {
+                    return d.id;
+                });
+                node.exit().remove();
+                node = node.enter().append('g').attr("class", "node").merge(node)
+                node.append("circle").attr("fill", function (d) {
+                    return color(d.id);
+                }).attr("r", radius);
+                node.append("text")
+                    .attr('text-anchor','middle')
+                    .attr('dy',-21)
+                    .classed('node-label', true)
+                    .text((d) => d.id)
+                node.call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended))
+
+
+                let maxWeight=d3.max(links,l=>l.weight)
+                link = link.data(links, function (d) {
+                    return d.id;
+                });
+                link.exit().remove();
+                link = link.enter().append("line").attr("stroke", "white").attr("stroke-width", d=>d.weight*(radius/2)/maxWeight+0.1).merge(link);
+
+
+                simulation.nodes(nodes);
+                simulation.force("link", d3.forceLink().distance(100).strength(0.1)
+                    .id(function (d) {
+                        return d.id;
+                    })
+                    .links(links));
+                simulation.alpha(1).restart();
+            })
+        })
+    }
+</script>
+
+
+<style>
+    body {
+        margin: 0px;
+        padding: 0px;
+    }
+
+    #wrapper {
+        overflow: hidden;
+        width: 100%
+    }
+
+    #layers {
+        width: 200px;
+        height: 100%;
+        background-color: #009bd6;
+        float: left;
+    }
+
+    #container {
+        height: 100%;
+        background-color: white;
+        overflow: hidden;
+    }
+
+    .node-label {
+        fill: white;
+        pointer-events: none;
+    }
+
+    .counter-container{
+        padding: 2px;
+        margin: 2px;
+        background-color: whitesmoke;
+    }
+    .counter-container > label {
+        font-weight: bold;
+    }
+    .img-container{
+        text-align: center;
+    }
+    .filters-container{
+        color: white;
+    }
+    .body{
+        font-family: Arial, Verdana, Helvetica;
+    }
+</style>
+</html>
