@@ -39,7 +39,7 @@ namespace LiteArch.Trafik.Domain
 
         public override string ToString()
         {
-            return $"{HostName}:{Ip}";
+            return $"$:{HostName}:{Ip}";
         }
     }
 }

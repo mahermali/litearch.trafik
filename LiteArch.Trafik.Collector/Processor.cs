@@ -43,6 +43,7 @@ namespace LiteArch.Trafik.Collector
                     if (row == null) continue;
                     Console.WriteLine(row.ToString());
                     if(row is SamplerIp samplerIp) _dockerIps.Add(samplerIp);
+                    Console.WriteLine($"Docker IPs#: {_dockerIps.Count}");
                     if (!(row is SamplerLink samplerLink)) continue;
                     var key = $"{Constants.RedisKeyPrefix}{samplerLink.ReplaceDockerIps(_dockerIps)}";
                     _db.StringIncrement(key);
