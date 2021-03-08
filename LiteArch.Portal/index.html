@@ -114,7 +114,7 @@
     }
 
     function refresh() {
-        let env=d3.json('/env').then(r=>{
+        let env=d3.json('<%=TRAFIK_PORTAL_PREFIX%>/env').then(r=>{
             let baseUrl=r.baseUrl
             d3.json(`${baseUrl}/topology`).then(json => {
 
