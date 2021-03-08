@@ -53,6 +53,11 @@ namespace LiteArch.Trafik.Domain
         public SamplerLink ReplaceDockerIps(List<SamplerIp> dockerIps)
         {
             if (dockerIps == null || !dockerIps.Any()) return this;
+            Console.WriteLine($"Replacing: [{SourceAddress}, {TargetAddress}]->[{dockerIps.Count}]");
+            foreach (var samplerIp in dockerIps)
+            {
+                Console.WriteLine($"{samplerIp.Ip}->{samplerIp.HostName}");
+            }
             SourceAddress = dockerIps
                 .Any(x => string.Equals(x.Ip, SourceAddress, StringComparison.CurrentCultureIgnoreCase))
                 ? dockerIps
