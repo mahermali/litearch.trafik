@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafik.Domain.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafik.Consolidator", "LiteArch.Trafik.Consolidator\LiteArch.Trafik.Consolidator.csproj", "{127ABC82-5583-4AA8-869C-525D1311E9C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiteArch.Trafik.Api", "LiteArch.Trafik.Api\LiteArch.Trafik.Api.csproj", "{92977FE4-A0EF-450F-90CF-9CF7D6C82A16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{127ABC82-5583-4AA8-869C-525D1311E9C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{127ABC82-5583-4AA8-869C-525D1311E9C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{127ABC82-5583-4AA8-869C-525D1311E9C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92977FE4-A0EF-450F-90CF-9CF7D6C82A16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92977FE4-A0EF-450F-90CF-9CF7D6C82A16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92977FE4-A0EF-450F-90CF-9CF7D6C82A16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92977FE4-A0EF-450F-90CF-9CF7D6C82A16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
