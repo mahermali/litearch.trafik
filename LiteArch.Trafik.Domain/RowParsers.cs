@@ -6,7 +6,7 @@ namespace LiteArch.Trafik.Domain
     {
         private static List<SamplerRow> _parsers = new List<SamplerRow>
         {
-            new SamplerIp(),
+            new SamplerDockerMetadata(),
             new SamplerLink()
         };
 

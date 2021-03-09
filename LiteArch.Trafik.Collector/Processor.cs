@@ -18,7 +18,7 @@ namespace LiteArch.Trafik.Collector
         private readonly int _maxRetentionSeconds;
         private readonly Stream _stream;
         private readonly ConnectionMultiplexer redis;
-        private readonly List<SamplerIp> _dockerIps = new List<SamplerIp>();
+        private readonly List<SamplerDockerMetadata> _dockerIps = new List<SamplerDockerMetadata>();
 
         public Processor(TcpClient client, IConfiguration configuration)
         {
@@ -44,10 +44,10 @@ namespace LiteArch.Trafik.Collector
                     var row = RowParsers.Parse(data);
                     if (row == null) continue;
                     Console.WriteLine(row.ToString());
-                    if(row is SamplerIp samplerIp) _dockerIps.Add(samplerIp);
+                    if(row is SamplerDockerMetadata samplerIp) _dockerIps.Add(samplerIp);
                     Console.WriteLine($"Docker IPs#: {_dockerIps.Count}");
                     if (!(row is SamplerLink samplerLink)) continue;
-                    var key = $"{Constants.RedisKeyPrefix}{samplerLink.ReplaceDockerIps(_dockerIps)}";
+                    var key = $"{Constants.RedisKeyPrefix}{samplerLink.ResolveDockerIPToNomadTask(_dockerIps)}";
                     _db.StringIncrement(key);
                     var expire = Math.Min(int.Parse(_db.StringGet(key)) * _startRetentionSeconds, _maxRetentionSeconds);
                     _db.KeyExpire(key, TimeSpan.FromSeconds(expire));

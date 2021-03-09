@@ -6,26 +6,37 @@ namespace LiteArch.Trafik.Domain
 {
     public class SamplerLink : SamplerRow
     {
-        public SamplerLink()
-        {
-        }
+        public string TargetPort { get; set; }
+
+        public string TargetAddress { get; set; }
+
+        public string SourcePort { get; set; }
+
+        public string SourceAddress { get; set; }
+        public string SourceTask { get; set; }
+        public string TargetTask { get; set; }
 
         public override bool IsSatisfiedBy(string row)
         {
-            return !string.IsNullOrEmpty(row) && (row.StartsWith("#") || row.StartsWith($"{Constants.RedisKeyPrefix}#"));
+            return !string.IsNullOrEmpty(row) &&
+                   (row.StartsWith("#") || row.StartsWith($"{Constants.RedisKeyPrefix}#") && row.Contains("|"));
         }
 
         public override SamplerRow Parse(string row)
         {
             if (string.IsNullOrEmpty(row)) return null;
             if (!IsSatisfiedBy(row)) return null;
-            int index = row.IndexOf(Constants.RedisKeyPrefix);
-            var data = (index < 0)
+            var index = row.IndexOf(Constants.RedisKeyPrefix);
+            var data = index < 0
                 ? row
                 : row.Remove(index, Constants.RedisKeyPrefix.Length);
 
             data = data.TrimStart('#');
-            var splits = data.Split("$");
+            var sections = data.Split("|");
+            if (sections.Length != 2) return null;
+
+            //First Section before |
+            var splits = sections[0].Split(":");
             if (splits.Length != 2) return null;
             var source = splits[0];
             var target = splits[1];
@@ -44,33 +55,39 @@ namespace LiteArch.Trafik.Domain
                     ?.TrimEnd('.'),
                 TargetPort = targetParts[targetParts.Length - 1]
             };
+
+            //Second Section After |
+            var secondSection = sections[1];
+            if (!string.IsNullOrEmpty(secondSection))
+            {
+                var tasks = secondSection.Split(":");
+                if (tasks.Length == 2)
+                {
+                    result.SourceTask = tasks[0];
+                    result.TargetTask = tasks[1];
+                }
+            }
+
             if (string.IsNullOrEmpty(result.SourceAddress) || string.IsNullOrEmpty(result.SourcePort) ||
                 string.IsNullOrEmpty(result.TargetAddress) || string.IsNullOrEmpty(result.TargetPort))
                 return null;
             return result;
         }
 
-        public SamplerLink ReplaceDockerIps(List<SamplerIp> dockerIps)
+        public SamplerLink ResolveDockerIPToNomadTask(List<SamplerDockerMetadata> dockerMetadatas)
         {
-            if (dockerIps == null || !dockerIps.Any()) return this;
-            Console.WriteLine($"Replacing: [{SourceAddress}, {TargetAddress}]->[{dockerIps.Count}]");
-            foreach (var samplerIp in dockerIps)
-            {
-                Console.WriteLine($"{samplerIp.Ip}->{samplerIp.HostName}");
-            }
-            SourceAddress = dockerIps
-                .Any(x => string.Equals(x.Ip, SourceAddress, StringComparison.CurrentCultureIgnoreCase))
-                ? dockerIps
-                    .FirstOrDefault(x => string.Equals(x.Ip, SourceAddress, StringComparison.CurrentCultureIgnoreCase))
-                    ?.HostName
-                : SourceAddress;
-            TargetAddress = dockerIps
-                .Any(x => string.Equals(x.Ip, TargetAddress, StringComparison.CurrentCultureIgnoreCase))
-                ? dockerIps
-                    .FirstOrDefault(x => string.Equals(x.Ip, TargetAddress, StringComparison.CurrentCultureIgnoreCase))
-                    ?.HostName
-                : TargetAddress;
+            if (dockerMetadatas == null || !dockerMetadatas.Any()) return this;
+            SourceTask = ResolveIPToNomadTask(SourceAddress, dockerMetadatas);
+            TargetTask = ResolveIPToNomadTask(TargetAddress, dockerMetadatas);
             return this;
+        }
+
+        private string ResolveIPToNomadTask(string ip, List<SamplerDockerMetadata> dockerMetadatas)
+        {
+            if (dockerMetadatas == null || !dockerMetadatas.Any()) return ip;
+            var found = dockerMetadatas.FirstOrDefault(x =>
+                string.Equals(x.DockerIp, ip, StringComparison.CurrentCultureIgnoreCase));
+            return found == null ? ip : $"{found.HostIp}/{found.Task}";
         }
 
         public override bool Equals(SamplerRow other)
@@ -84,7 +101,11 @@ namespace LiteArch.Trafik.Domain
                        && string.Equals(samplerLink.SourcePort, SourcePort, StringComparison.CurrentCultureIgnoreCase)
                        && string.Equals(samplerLink.TargetAddress, TargetAddress,
                            StringComparison.CurrentCultureIgnoreCase)
-                       && string.Equals(samplerLink.TargetPort, TargetPort, StringComparison.CurrentCultureIgnoreCase);
+                       && string.Equals(samplerLink.TargetPort, TargetPort, StringComparison.CurrentCultureIgnoreCase)
+                       && string.Equals(samplerLink.TargetAddress, TargetAddress,
+                           StringComparison.CurrentCultureIgnoreCase)
+                       && string.Equals(samplerLink.SourceTask, SourceTask, StringComparison.CurrentCultureIgnoreCase);
+                ;
             }
 
             return false;
@@ -92,15 +113,7 @@ namespace LiteArch.Trafik.Domain
 
         public override string ToString()
         {
-            return $"#{SourceAddress}.{SourcePort}${TargetAddress}.{TargetPort}";
+            return $"#{SourceAddress}.{SourcePort}:{TargetAddress}.{TargetPort}|{SourceTask}:{TargetTask}";
         }
-
-        public string TargetPort { get; set; }
-
-        public string TargetAddress { get; set; }
-
-        public string SourcePort { get; set; }
-
-        public string SourceAddress { get; set; }
     }
 }
