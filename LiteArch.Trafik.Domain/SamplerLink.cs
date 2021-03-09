@@ -87,7 +87,7 @@ namespace LiteArch.Trafik.Domain
             if (dockerMetadatas == null || !dockerMetadatas.Any()) return ip;
             var found = dockerMetadatas.FirstOrDefault(x =>
                 string.Equals(x.DockerIp, ip, StringComparison.CurrentCultureIgnoreCase));
-            return found == null ? ip : $"{found.HostIp}/{found.Task}";
+            return found == null ? null : $"{found.HostIp}/{found.Task}";
         }
 
         public override bool Equals(SamplerRow other)
