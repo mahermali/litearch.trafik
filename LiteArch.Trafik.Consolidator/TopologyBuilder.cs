@@ -110,7 +110,7 @@ namespace LiteArch.Trafik.Consolidator
             foreach (var service in Services)
                 if (string.Equals($"{service.Address}:{service.Port}", addressAndPort,
                     StringComparison.CurrentCultureIgnoreCase))
-                    return $"{service.Address}/:{service.Name}";
+                    return $"{service.Address}/{service.Name}";
 
             return addressAndPort;
         }
