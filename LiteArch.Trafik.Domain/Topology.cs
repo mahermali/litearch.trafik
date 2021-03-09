@@ -15,7 +15,7 @@ namespace LiteArch.Trafik.Domain
 
         public void BuildNodesFromLinks()
         {
-            Nodes.AddRange(Links.Select(x => x.Source).Union(Links.Select(x => x.Target)).Select(x => new TopologyNode
+            Nodes.AddRange(Links.Select(x => x.Source).Union(Links.Select(x => x.Target)).Distinct().Select(x => new TopologyNode
             {
                 Id = x
             }).ToList());
