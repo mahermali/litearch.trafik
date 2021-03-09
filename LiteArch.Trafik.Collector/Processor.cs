@@ -28,7 +28,7 @@ namespace LiteArch.Trafik.Collector
             _stream = _client.GetStream();
             _db = redis.GetDatabase();
             _startRetentionSeconds = int.Parse(configuration["Configuration:StartRetentionSeconds"]);
-            _startRetentionSeconds = int.Parse(configuration["Configuration:MaxRetentionSeconds"]);
+            _maxRetentionSeconds = int.Parse(configuration["Configuration:MaxRetentionSeconds"]);
         }
 
         public async Task Process()
