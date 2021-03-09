@@ -84,7 +84,7 @@ namespace LiteArch.Trafik.Domain
 
         private string ResolveIPToNomadTask(string ip, List<SamplerDockerMetadata> dockerMetadatas)
         {
-            if (dockerMetadatas == null || !dockerMetadatas.Any()) return ip;
+            if (dockerMetadatas == null || !dockerMetadatas.Any()) return null;
             var found = dockerMetadatas.FirstOrDefault(x =>
                 string.Equals(x.DockerIp, ip, StringComparison.CurrentCultureIgnoreCase));
             return found == null ? null : $"{found.HostIp}/{found.Task}";
