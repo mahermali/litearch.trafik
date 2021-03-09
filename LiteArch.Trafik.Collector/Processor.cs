@@ -14,7 +14,8 @@ namespace LiteArch.Trafik.Collector
     {
         private readonly TcpClient _client;
         private readonly IDatabase _db;
-        private readonly int _expiresInSeconds;
+        private readonly int _startRetentionSeconds;
+        private readonly int _maxRetentionSeconds;
         private readonly Stream _stream;
         private readonly ConnectionMultiplexer redis;
         private readonly List<SamplerIp> _dockerIps = new List<SamplerIp>();
@@ -26,7 +27,8 @@ namespace LiteArch.Trafik.Collector
             _client = client;
             _stream = _client.GetStream();
             _db = redis.GetDatabase();
-            _expiresInSeconds = int.Parse(configuration["Configuration:ExpiresInSeconds"]);
+            _startRetentionSeconds = int.Parse(configuration["Configuration:StartRetentionSeconds"]);
+            _startRetentionSeconds = int.Parse(configuration["Configuration:MaxRetentionSeconds"]);
         }
 
         public async Task Process()
@@ -47,7 +49,8 @@ namespace LiteArch.Trafik.Collector
                     if (!(row is SamplerLink samplerLink)) continue;
                     var key = $"{Constants.RedisKeyPrefix}{samplerLink.ReplaceDockerIps(_dockerIps)}";
                     _db.StringIncrement(key);
-                    _db.KeyExpire(key, TimeSpan.FromSeconds(int.Parse(_db.StringGet(key))*_expiresInSeconds));
+                    var expire = Math.Min(int.Parse(_db.StringGet(key)) * _startRetentionSeconds, _maxRetentionSeconds);
+                    _db.KeyExpire(key, TimeSpan.FromSeconds(expire));
                 }
             }
             catch (Exception e)
